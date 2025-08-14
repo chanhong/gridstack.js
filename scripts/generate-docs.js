@@ -16,7 +16,7 @@ const config = {
     root: '.',
     typedocConfig: 'typedoc.json',
     typedocHtmlConfig: 'typedoc.html.json',
-    outputDir: 'docs'
+    outputDir: 'doc'
   },
   
   // Angular library paths
@@ -24,7 +24,7 @@ const config = {
     root: 'angular',
     typedocConfig: 'typedoc.json',
     typedocHtmlConfig: 'typedoc.html.json',
-    outputDir: 'docs'
+    outputDir: 'doc'
   },
   
   // Output configuration
@@ -118,14 +118,17 @@ function generateLibraryDocs(libConfig, libName) {
       `Generating Markdown docs for ${libName}`
     );
     
-    // Remove _media directory if it exists (similar to main library)
-    const mediaPath = path.join(root, libConfig.outputDir, 'api', '_media');
-    if (fs.existsSync(mediaPath)) {
-      execCommand(
-        `rm -rf ${path.join(libConfig.outputDir, 'api', '_media')}`,
-        root,
-        `Removing _media directory for ${libName}`
-      );
+    // For main library, no _media directory cleanup needed since we generate a single file
+    // For Angular library, remove _media directory if it exists
+    if (libName === 'Angular Library') {
+      const mediaPath = path.join(root, libConfig.outputDir, 'api', '_media');
+      if (fs.existsSync(mediaPath)) {
+        execCommand(
+          `rm -rf ${path.join(libConfig.outputDir, 'api', '_media')}`,
+          root,
+          `Removing _media directory for ${libName}`
+        );
+      }
     }
   }
   
@@ -185,10 +188,15 @@ function cleanup() {
   
   console.log(`\n🧹 Cleaning up old documentation...`);
   
-  // Clean main library docs
+  // Clean main library docs (API.md and HTML docs)
   const mainDocsPath = path.join(config.mainLib.root, config.mainLib.outputDir);
   if (fs.existsSync(mainDocsPath)) {
-    execCommand(`rm -rf ${mainDocsPath}/api ${mainDocsPath}/html`, '.', 'Cleaning main library docs');
+    execCommand(`rm -rf ${mainDocsPath}/classes ${mainDocsPath}/interfaces ${mainDocsPath}/type-aliases ${mainDocsPath}/variables`, '.', 'Cleaning main library markdown docs');
+  }
+  
+  // Clean HTML docs
+  if (fs.existsSync('doc/html')) {
+    execCommand(`rm -rf doc/html`, '.', 'Cleaning main library HTML docs');
   }
   
   // Clean Angular docs
@@ -307,13 +315,13 @@ function main() {
     console.log(`\nGenerated documentation:`);
     
     if (!options.angularOnly) {
-      console.log(`   📄 Main Library Markdown: docs/api/`);
-      console.log(`   🌐 Main Library HTML: docs/html/`);
+      console.log(`   📄 Main Library Markdown: doc/API.md`);
+      console.log(`   🌐 Main Library HTML: doc/html/`);
     }
     
     if (!options.mainOnly) {
-      console.log(`   📄 Angular Library Markdown: angular/docs/api/`);
-      console.log(`   🌐 Angular Library HTML: angular/docs/html/`);
+      console.log(`   📄 Angular Library Markdown: angular/doc/api/`);
+      console.log(`   🌐 Angular Library HTML: angular/doc/html/`);
     }
     
   } catch (error) {

@@ -1,6 +1,6 @@
 /**
- * dd-base-impl.ts 12.2.2-dev
- * Copyright (c) 2021-2024  Alain Dumesny - see GridStack root license
+ * dd-base-impl.ts 12.3.3
+ * Copyright (c) 2021-2025  Alain Dumesny - see GridStack root license
  */
 
 /**
@@ -30,7 +30,7 @@ export abstract class DDBaseImplement {
 
   /**
    * Register an event callback for the specified event.
-   * 
+   *
    * @param event - Event name to listen for
    * @param callback - Function to call when event occurs
    */
@@ -40,7 +40,7 @@ export abstract class DDBaseImplement {
 
   /**
    * Unregister an event callback for the specified event.
-   * 
+   *
    * @param event - Event name to stop listening for
    */
   public off(event: string): void {
@@ -73,7 +73,7 @@ export abstract class DDBaseImplement {
 
   /**
    * Trigger a registered event callback if one exists and the implementation is enabled.
-   * 
+   *
    * @param eventName - Name of the event to trigger
    * @param event - DOM event object to pass to the callback
    * @returns Result from the callback function, if any
