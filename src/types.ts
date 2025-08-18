@@ -1,6 +1,6 @@
 /**
- * types.ts 12.2.2-dev
- * Copyright (c) 2021-2024 Alain Dumesny - see GridStack root license
+ * types.ts 12.3.3
+ * Copyright (c) 2021-2025 Alain Dumesny - see GridStack root license
  */
 
 import { GridStack } from './gridstack';
@@ -43,10 +43,10 @@ export const gridDefaults: GridStackOptions = {
 
 /**
  * Different layout options when changing the number of columns.
- * 
+ *
  * These options control how widgets are repositioned when the grid column count changes.
  * Note: The new list may be partially filled if there's a cached layout for that size.
- * 
+ *
  * Options:
  * - `'list'`: Treat items as a sorted list, keeping them sequentially without resizing (unless too big)
  * - `'compact'`: Similar to list, but uses compact() method to fill empty slots by reordering
@@ -109,7 +109,7 @@ export type GridStackEventHandlerCallback = GridStackEventHandler | GridStackEle
 /**
  * Optional callback function called during load() operations.
  * Allows custom handling of widget addition/removal for framework integration.
- * 
+ *
  * @param parent - The parent HTML element
  * @param w - The widget definition
  * @param add - True if adding, false if removing
@@ -121,7 +121,7 @@ export type AddRemoveFcn = (parent: HTMLElement, w: GridStackWidget, add: boolea
 /**
  * Optional callback function called during save() operations.
  * Allows adding custom data to the saved widget structure.
- * 
+ *
  * @param node - The internal grid node
  * @param w - The widget structure being saved (can be modified)
  */
@@ -130,7 +130,7 @@ export type SaveFcn = (node: GridStackNode, w: GridStackWidget) => void;
 /**
  * Optional callback function for custom widget content rendering.
  * Called during load()/addWidget() to create custom content beyond plain text.
- * 
+ *
  * @param el - The widget's content container element
  * @param w - The widget definition with content and other properties
  */
@@ -139,14 +139,14 @@ export type RenderFcn = (el: HTMLElement, w: GridStackWidget) => void;
 /**
  * Optional callback function for custom resize-to-content behavior.
  * Called when a widget needs to resize to fit its content.
- * 
+ *
  * @param el - The grid item element to resize
  */
 export type ResizeToContentFcn = (el: GridItemHTMLElement) => void;
 
 /**
  * Configuration for responsive grid behavior.
- * 
+ *
  * Defines how the grid responds to different screen sizes by changing column counts.
  * NOTE: Make sure to include the appropriate CSS (gridstack-extra.css) to support responsive behavior.
  */
@@ -183,10 +183,25 @@ export interface Breakpoint {
  */
 export interface GridStackOptions {
   /**
-   * accept widgets dragged from other grids or from outside (default: `false`). Can be:
-   * `true` (uses `'.grid-stack-item'` class filter) or `false`,
-   * string for explicit class name,
-   * function returning a boolean. See [example](http://gridstack.github.io/gridstack.js/demo/two.html)
+   * Accept widgets dragged from other grids or from outside (default: `false`). Can be:
+   * - `true`: will accept HTML elements having 'grid-stack-item' as class attribute
+   * - `false`: will not accept any external widgets
+   * - string: explicit class name to accept instead of default
+   * - function: callback called before an item will be accepted when entering a grid
+   *
+   * @example
+   * // Accept all grid items
+   * acceptWidgets: true
+   *
+   * // Accept only items with specific class
+   * acceptWidgets: 'my-draggable-item'
+   *
+   * // Custom validation function
+   * acceptWidgets: (el) => {
+   *   return el.getAttribute('data-accept') === 'true';
+   * }
+   *
+   * @see {@link http://gridstack.github.io/gridstack.js/demo/two.html} for complete example
    */
   acceptWidgets?: boolean | string | ((element: Element) => boolean);
 
@@ -204,12 +219,28 @@ export interface GridStackOptions {
   auto?: boolean;
 
   /**
-   * one cell height (default?: 'auto'). Can be:
-   *  an integer (px)
-   *  a string (ex: '100px', '10em', '10rem'). Note: % doesn't work right - see demo/cell-height.html
-   *  0, in which case the library will not generate styles for rows. Everything must be defined in your own CSS files.
-   *  'auto' - height will be calculated for square cells (width / column) and updated live as you resize the window - also see `cellHeightThrottle`
-   *  'initial' - similar to 'auto' (start at square cells) but stay that size during window resizing.
+   * One cell height (default: 'auto'). Can be:
+   * - an integer (px): fixed pixel height
+   * - a string (ex: '100px', '10em', '10rem'): CSS length value
+   * - 0: library will not generate styles for rows (define your own CSS)
+   * - 'auto': height calculated for square cells (width / column) and updated live on window resize
+   * - 'initial': similar to 'auto' but stays fixed size during window resizing
+   *
+   * Note: % values don't work correctly - see demo/cell-height.html
+   *
+   * @example
+   * // Fixed 100px height
+   * cellHeight: 100
+   *
+   * // CSS units
+   * cellHeight: '5rem'
+   * cellHeight: '100px'
+   *
+   * // Auto-sizing for square cells
+   * cellHeight: 'auto'
+   *
+   * // No CSS generation (custom styles)
+   * cellHeight: 0
    */
   cellHeight?: numberOrString;
 
